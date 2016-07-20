@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2009-2016 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.imooc.dao.IMessage">
+
+  <!-- 该标签用于接收查询结果, 同一个mapper标签下的该标签id不可重复  -->
+  <resultMap type="com.imooc.bean.Message" id="MessageResult">
+    <!-- 对应主键 -->
+    <id column="id" jdbcType="INTEGER" property="id"/>
+    <!-- 对应普通的字段 -->
+    <result column="command" jdbcType="VARCHAR" property="command"/>
+    <result column="description" jdbcType="VARCHAR" property="description"/>
+    <result column="content" jdbcType="VARCHAR" property="content"/>
+  </resultMap>
+  
+  <sql id="columns">id,command,description,content</sql>
+
+  <!-- 该标签用于配置SQL语句, 同一个mapper标签下的该标签id不可重复 -->
+  <select id="queryMessageList" parameterType="java.util.Map" resultMap="MessageResult">
+    SELECT id,command,description,content FROM message
+    <where>
+	    <!-- 使用if标签类似于Java中if语句, test中的判断条件使用OGNL表达式 -->
+	    <if test="command != null and !&quot;&quot;.equals(command.trim())">
+	    	AND command=#{message.command}
+	    </if>
+	    <if test="description != null and !&quot;&quot;.equals(description.trim())">
+	    	AND description like '%' #{message.description} '%'
+	    </if>
+    </where>
+    ORDER BY id LIMIT #{page.dbIndex},#{page.dbNumber}
+  </select>
+  
+    <select id="count"  parameterType="com.imooc.bean.Message" resultType="int">
+  	SELECT count(*) FROM message
+    <where>
+    	<if test="command != null and !&quot;&quot;.equals(command.trim())">
+	    	AND command=#{command}
+	    </if>
+	    <if test="description != null and !&quot;&quot;.equals(description.trim())">
+	    	AND description LIKE '%' #{description} '%'
+	    </if>
+    </where>
+  </select>
+  
+  <select id="queryMessageListByPage" parameterType="java.util.Map" resultMap="MessageResult">
+    SELECT <include refid="columns"/> FROM message
+    <where>
+    	<if test="message.command != null and !&quot;&quot;.equals(message.command.trim())">
+	    	AND command=#{message.command}
+	    </if>
+	    <if test="message.description != null and !&quot;&quot;.equals(message.description.trim())">
+	    	AND description LIKE '%' #{message.description} '%'
+	    </if>
+    </where>
+    ORDER BY id
+  </select>
+
+  <delete id="deleteOne" parameterType="int">
+  	DELETE FROM message WHERE id=#{_parameter}
+  </delete>
+
+  <delete id="deleteBatch" parameterType="java.util.List">
+  	DELETE FROM message WHERE id IN (
+  		<foreach collection="list" item="item" separator=",">
+  			#{item}
+  		</foreach>
+  	)
+  </delete>
+
+</mapper>

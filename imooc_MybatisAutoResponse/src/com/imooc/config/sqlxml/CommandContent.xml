@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2009-2016 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.imooc.dao.ICommandContent">
+
+  <!-- 该标签用于接收查询结果, 同一个mapper标签下的该标签id不可重复  -->
+  <resultMap type="com.imooc.bean.CommandContent" id="Content">
+    <!-- 对应主键 -->
+    <id column="id" jdbcType="INTEGER" property="id"/>
+    <!-- 对应普通的字段 -->
+    <result column="content" jdbcType="VARCHAR" property="content"/>
+    <result column="command_id" jdbcType="INTEGER" property="commandId"/>
+  </resultMap>
+
+  <insert id="insertOne" parameterType="com.imooc.bean.CommandContent">
+  	insert into COMMAND_CONTENT(CONTENT,COMMAND_ID) values(#{content},#{commandId})
+  </insert>
+  
+  <insert id="insertBatch" parameterType="java.util.List">
+  	insert into COMMAND_CONTENT(CONTENT,COMMAND_ID) values
+  	<foreach collection="list" item="item" separator=",">
+  		(#{item.content},#{item.commandId})
+  	</foreach>
+  </insert>
+
+</mapper>
